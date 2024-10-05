@@ -1,4 +1,4 @@
-name: Test SSH Connection and Deploy
++name: Test SSH Connection and Deploy
 
 on:
   push:
@@ -37,11 +37,16 @@ jobs:
         # Connect to the VM and deploy the application
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS << 'EOF'
           echo "Deploying application on VM"
+          
+          # Update package list and install python3-venv if not already installed
+          sudo apt update
+          sudo apt install -y python3-venv python3-pip
+
           # Navigate to the application directory
-          cd /home/*** # Replace with your actual app directory
+          cd /home/azureuser 
 
           # Create a virtual environment
-          sudo apt install python3 -m venv myenv
+          python3 -m venv myenv
           # Activate the virtual environment
           source myenv/bin/activate
 
