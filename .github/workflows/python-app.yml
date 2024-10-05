@@ -25,10 +25,6 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Archive repository
-      run: |
-        git archive -o repo.tar.gz HEAD
-
     - name: Deploy to VM
       env:
         HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
@@ -36,9 +32,9 @@ jobs:
         IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
       run: |
         echo "Connecting to VM"
-        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $KEY_NAME repo.tar.gz $HOST_NAME@$IP_ADDRESS:/home/azureuser
+        scp -o StrictHostKeyChecking=no -i $KEY_NAME repo.tar.gz $HOST_NAME@$IP_ADDRESS:/home/azureuser
         
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $KEY_NAME $HOST_NAME@$IP_ADDRESS << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $KEY_NAME $HOST_NAME@$IP_ADDRESS << 'EOF'
           set -e
           echo "Extracting repository on VM"
           cd /home/azureuser
@@ -49,7 +45,7 @@ jobs:
           python -m venv $VENV_DIR
           
           # Activate the virtual environment
-          source venv/bin/activate
+          source $VENV_DIR/bin/activate
           
           # Optional: Install dependencies if there's a requirements.txt
           if [ -f requirements.txt ]; then
