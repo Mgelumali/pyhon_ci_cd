@@ -1,49 +1,24 @@
-name: Python application
+name: Test SSH Connection
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
-permissions:
-  contents: read
 
 jobs:
-  build:
+  test_ssh:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Set up Python 3.10 environment
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-
-    - name: Deploy to VM
+    - name: Test SSH Connection
       env:
         HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
         KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
         IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
       run: |
-        echo "Connecting to VM"
-        scp -o StrictHostKeyChecking=no -i $KEY_NAME repo.tar.gz $HOST_NAME@$IP_ADDRESS:/home/azureuser
-
-        ssh -o StrictHostKeyChecking=no -i $KEY_NAME $HOST_NAME@$IP_ADDRESS << 'EOF'
-          echo "Extracting repository on VM"
-          cd /home/azureuser
-          tar -xzf repo.tar.gz
-
-          echo "Creating a virtual environment"
-          python -m venv myenv
-          source myenv/bin/activate
-
-          echo "Running the application"
-          python app.py
-        EOF     
-       
+        echo "$KEY_NAME" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS 'echo "Connected successfully"'
