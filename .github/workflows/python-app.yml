@@ -38,15 +38,19 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS << 'EOF'
           echo "Deploying application on VM"
           # Navigate to the application directory
-          cd /home/azureuser
+          cd /home/*** # Replace with your actual app directory
 
           # Create a virtual environment
           python3 -m venv myenv
+          # Activate the virtual environment
           source myenv/bin/activate
+
+          # Upgrade pip
+          pip install --upgrade pip
 
           # Install Gunicorn
           pip install gunicorn
 
           # Run the application with Gunicorn
-          gunicorn app:app --bind 0.0.0.0:5000 --daemon # Adjust the app reference and port as needed
+          gunicorn app:app --bind 0.0.0.0:8000 --daemon # Adjust the app reference and port as needed
         EOF
