@@ -57,5 +57,5 @@ jobs:
           pip install gunicorn
 
           # Run the application with Gunicorn
-          gunicorn app:app --bind 0.0.0.0:8000 --daemon # Adjust the app reference and port as needed
+          gunicorn app:app --bind 0.0.0.0:5000 --daemon # Adjust the app reference and port as needed
         EOF
