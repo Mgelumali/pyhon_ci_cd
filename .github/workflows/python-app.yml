@@ -28,22 +28,30 @@ jobs:
         # Test the SSH connection
         ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS 'echo "Connected successfully"'
 
+    - name: Copy Files to Server
+      env:
+        HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
+        KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
+        IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
+      run: |
+        # Use scp to copy files to the remote server
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./my-repo $HOST_NAME@$IP_ADDRESS:~/my-repo
+
     - name: Deploy Application
       env:
         HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
         KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
         IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
       run: |
-        # Connect to the VM and deploy the application
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS << 'EOF'
           echo "Deploying application on VM"
-          
-          # Update package list and install python3-venv if not already installed
+
+          # Update package list and install required packages
           sudo apt update
           sudo apt install -y python3-venv python3-pip
 
-          # Navigate to the application directory
-          cd /home/azureuser 
+          # Navigate to the repo directory
+          cd ~/my-repo
 
           # Create a virtual environment
           python3 -m venv myenv
@@ -56,6 +64,6 @@ jobs:
           # Install Gunicorn
           pip install gunicorn
 
-          # Run the application with Gunicorn
-          gunicorn app:app --bind 0.0.0.0:5000 --daemon # Adjust the app reference and port as needed
+          # Run the application with Gunicorn on port 5000
+          gunicorn app:app --bind 0.0.0.0:5000 --daemon # Adjust the app reference as needed
         EOF
