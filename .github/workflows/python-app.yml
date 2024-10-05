@@ -1,4 +1,4 @@
-name: Test SSH Connection
+name: Test SSH Connection and Deploy
 
 on:
   push:
@@ -27,3 +27,26 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         # Test the SSH connection
         ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS 'echo "Connected successfully"'
+
+    - name: Deploy Application
+      env:
+        HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
+        KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
+        IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
+      run: |
+        # Connect to the VM and deploy the application
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS << 'EOF'
+          echo "Deploying application on VM"
+          # Navigate to the application directory
+          cd /home/azureuser
+
+          # Create a virtual environment
+          python3 -m venv myenv
+          source myenv/bin/activate
+
+          # Install Gunicorn
+          pip install gunicorn
+
+          # Run the application with Gunicorn
+          gunicorn app:app --bind 0.0.0.0:5000 --daemon # Adjust the app reference and port as needed
+        EOF
