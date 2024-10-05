@@ -51,7 +51,7 @@ jobs:
           pip install gunicorn
 
           # Create a systemd service file
-          echo "[Unit]
+          [Unit]
           Description=Gunicorn instance to serve my application
           After=network.target
 
@@ -59,11 +59,10 @@ jobs:
           User=azureuser
           Group=www-data
           WorkingDirectory=/home/azureuser
-          Environment=\"PATH=/home/azureuser/myenv/bin\"
+          Environment="PATH=/home/azureuser/myenv/bin"
           ExecStart=/home/azureuser/myenv/bin/gunicorn --workers 3 --bind unix:myapp.sock -m 007 app:app
-
           [Install]
-          WantedBy=multi-user.target" | sudo tee /etc/systemd/system/myapp.service
+          WantedBy=multi-user.target
 
           # Start and enable the service
           sudo systemctl start myapp
