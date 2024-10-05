@@ -19,6 +19,11 @@ jobs:
         KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
         IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
       run: |
+        # Create the .ssh directory
+        mkdir -p ~/.ssh
+        # Write the SSH private key to the file
         echo "$KEY_NAME" > ~/.ssh/id_rsa
+        # Set permissions for the key file
         chmod 600 ~/.ssh/id_rsa
+        # Test the SSH connection
         ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS 'echo "Connected successfully"'
