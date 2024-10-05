@@ -41,7 +41,7 @@ jobs:
           cd /home/*** # Replace with your actual app directory
 
           # Create a virtual environment
-          python3 -m venv myenv
+          sudo apt install python3 -m venv myenv
           # Activate the virtual environment
           source myenv/bin/activate
 
