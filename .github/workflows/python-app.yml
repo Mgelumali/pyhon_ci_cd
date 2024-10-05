@@ -1,0 +1,46 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Deploy to VM
+      env:
+        HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
+        KEY_NAME: ${{ secrets.SERVER_KEY_NAME }}
+        IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
+      run: |
+        echo "Connecting to VM"
+        ssh -o StrictHostKeyChecking=no -i $KEY_NAME $HOST_NAME@$IP_ADDRESS << 'EOF'
+          echo "Copying file to VM"
+          scp -i $KEY_NAME <local_file_path> $HOST_NAME@$IP_ADDRESS:/home/azureuser
+
+          echo "Creating a virtual environment"
+          python -m venv myenv
+          source myenv/bin/activate
+
+          echo "Installing dependencies"
+          pip install gunicorn flask
+
+          echo "Running the application"
+          python app.py
+        EOF
