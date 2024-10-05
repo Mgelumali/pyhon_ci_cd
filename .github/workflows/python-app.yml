@@ -26,7 +26,7 @@ jobs:
         echo "$KEY_NAME" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $HOST_NAME@$IP_ADDRESS 'echo "Connected successfully"'
-
+        
     - name: Copy Files to Server
       env:
         HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
@@ -49,5 +49,23 @@ jobs:
           source ~/myenv/bin/activate
           pip install --upgrade pip
           pip install gunicorn
-          gunicorn app:app --bind 0.0.0.0:5000 --daemon
+
+          # Create a systemd service file
+          echo "[Unit]
+          Description=Gunicorn instance to serve my application
+          After=network.target
+
+          [Service]
+          User=azureuser
+          Group=www-data
+          WorkingDirectory=/home/azureuser
+          Environment=\"PATH=/home/azureuser/myenv/bin\"
+          ExecStart=/home/azureuser/myenv/bin/gunicorn --workers 3 --bind unix:myapp.sock -m 007 app:app
+
+          [Install]
+          WantedBy=multi-user.target" | sudo tee /etc/systemd/system/myapp.service
+
+          # Start and enable the service
+          sudo systemctl start myapp
+          sudo systemctl enable myapp
         EOF
