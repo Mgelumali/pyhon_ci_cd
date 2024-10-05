@@ -59,7 +59,7 @@ jobs:
           User=azureuser
           Group=www-data
           WorkingDirectory=/home/azureuser
-          Environment='PATH=/home/azureuser/myenv/bin'
+          Environment='PATH=/home/azureuser/myenv'
           ExecStart=/home/azureuser/myenv/bin/gunicorn --workers 3 --bind unix:myapp.sock -m 007 app:app
 
           [Install]
