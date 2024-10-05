@@ -60,7 +60,7 @@ jobs:
           Group=www-data
           WorkingDirectory=/home/azureuser
           Environment='PATH=/home/azureuser/myenv/bin'
-          ExecStart=/home/azureuser/myenv/bin/gunicorn --workers 3 --bind unix:myapp.sock -m 007 python:app
+          ExecStart=/home/azureuser/myenv/bin/gunicorn --workers 3 --bind unix:myapp.sock -m 007 app:app
 
           [Install]
           WantedBy=multi-user.target" | sudo tee /etc/systemd/system/myapp.service
