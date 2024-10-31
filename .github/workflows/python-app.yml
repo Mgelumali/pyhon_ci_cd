@@ -35,6 +35,9 @@ jobs:
       run: |
         scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./* $HOST_NAME@$IP_ADDRESS:/home/azureuser/
 
+    - name: Wait for 10 minutes
+      run: sleep 600  # 600 seconds = 10 minutes
+
     - name: Deploy Application
       env:
         HOST_NAME: ${{ secrets.SERVER_HOST_NAME }}
